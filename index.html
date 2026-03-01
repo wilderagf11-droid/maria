@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Invitación Revelación de Sexo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --card: rgba(255,255,255,.88);
+    --shadow: 0 0 25px rgba(0,0,0,.15);
+    --radius: 25px;
+    --boy:#9fd3ff;
+    --girl:#ffc1dc;
+    --map:#b5f5c8;
+    --rsvp:#ffe08a;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+
+    /* ✅ Fondo con SOLO ositos (prioridad a ositos-bg.png).
+       Si no existe, usa fondo-ositos.png. Si tampoco existe, cae al gradiente. */
+    background:
+      url("ositos-bg.png") center/cover no-repeat,
+      url("fondo-ositos.png") center/cover no-repeat,
+      linear-gradient(90deg,#cce6ff,#ffd6e8);
+
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: 18px 14px;
+    overflow-x:hidden;
+  }
+
+  /* Capa suave para que el texto se lea sobre el fondo */
+  body:before{
+    content:"";
+    position:fixed; inset:0;
+    background: radial-gradient(900px 600px at 50% 40%, rgba(255,255,255,.35), rgba(255,255,255,.10), transparent 70%);
+    pointer-events:none;
+  }
+
+  
+  .container{
+    position:relative;
+    padding:22px;
+    border-radius: 26px;
+    text-align:center;
+    width:min(380px, 100%);
+    z-index:2;
+
+    /* ✅ Tarjeta con fondo hermoso (ositos suave) + glass para que todo se lea limpio */
+    background:
+      linear-gradient(rgba(255,255,255,.84), rgba(255,255,255,.84)),
+      url("ositos-bg.png") center/cover no-repeat,
+      url("fondo-ositos.png") center/cover no-repeat;
+
+    box-shadow:
+      0 20px 45px rgba(0,0,0,.18),
+      inset 0 0 0 1px rgba(255,255,255,.70);
+
+    backdrop-filter: blur(10px);
+    overflow:hidden;
+  }
+
+  /* ✅ Tinte romántico muy suave (rosa/azul) sin cargar */
+  .container::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: 26px;
+    background: linear-gradient(135deg, rgba(255,182,213,.14), rgba(159,211,255,.14));
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ✅ Asegura que el contenido quede encima del tinte */
+  .container > *{ position:relative; z-index:1; }
+
+h1{
+    font-family:'Great Vibes',cursive;
+    font-size:40px;
+    color:#ff6fae;
+    margin: 2px 0 10px;
+    line-height:1.05;
+  }
+
+  p{
+    color:#555;
+    font-size:15px;
+    margin:8px 0;
+  }
+
+  .date{
+    font-weight:600;
+    font-size:16px;
+    color:#333;
+  }
+
+  .counter{
+    font-size:15px;
+    font-weight:700;
+    color:#2f3a4a;
+    margin:12px 0 10px;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+
+    /* ✅ Pastillita para que no “atraviese” y se lea bonito */
+    padding: 9px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    white-space:nowrap;
+  }
+
+  .votes{
+    margin: 6px 0 12px;
+    display:flex;
+    justify-content:center;
+    gap: 10px;
+    flex-wrap:wrap;
+  }
+  .votes span{
+    font-weight:800;
+    font-size:13px;
+    color:#2f3a4a;
+    background: rgba(255,255,255,.70);
+    border: 1px solid rgba(255,255,255,.85);
+    padding: 7px 10px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    white-space:nowrap;
+  }
+
+  .lockMsg{
+    margin: 8px 0 0;
+    font-weight:800;
+    color:#2f3a4a;
+    font-size:13px;
+    opacity:0;
+    transform: translateY(4px);
+    transition:.2s ease;
+  }
+  .lockMsg.show{ opacity:1; transform:translateY(0); }
+
+  button{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    border-radius: 25px;
+    border:none;
+    font-size:16px;
+    cursor:pointer;
+    transition: transform .10s ease, filter .18s ease;
+    box-shadow: 0 10px 22px rgba(0,0,0,.08);
+    position:relative;
+    overflow:hidden;
+    font-weight:800;
+    letter-spacing:.1px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:hover{transform:scale(1.03)}
+  button:active{transform: translateY(1px) scale(.99); filter: brightness(1.03);}
+
+  /* brillo al click */
+  button::after{
+    content:"";
+    position:absolute;
+    inset:-60%;
+    background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,255,255,.55), transparent 55%);
+    opacity:0;
+    transition: opacity .2s ease;
+    pointer-events:none;
+  }
+  button.pulse::after{ opacity:1; }
+
+  .boy{background: var(--boy);}
+  .girl{background: var(--girl);}
+  .map{background: var(--map);}
+  .rsvp{background: var(--rsvp);}
+
+  button[disabled]{
+    opacity: .75;
+    cursor:not-allowed;
+    filter:saturate(.9);
+  }
+
+  /* Pantalla inicial */
+  .start{
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(255,255,255,.92);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:10;
+    padding: 18px 14px;
+    text-align:center;
+  }
+  .start h2{
+    margin: 0 0 10px;
+    font-size: 18px;
+    color:#333;
+  }
+  .start button{
+    background:#ffb6d5;
+    font-size:18px;
+    width:min(360px, 100%);
+  }
+
+  /* Lluvia (globos / corazones) */
+  .rainLayer{
+    position:fixed; inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index: 999;
+  }
+  .drop{
+    position:absolute;
+    top:-60px;
+    font-size:24px;
+    animation: fall linear forwards;
+    filter: drop-shadow(0 10px 12px rgba(0,0,0,.18));
+    opacity:.98;
+    will-change: transform;
+  }
+  @keyframes fall{
+    to{
+      transform: translateY(calc(100vh + 160px)) rotate(var(--rot)) scale(var(--sc));
+      opacity:1;
+    }
+  }
+
+  /* ✅ Animación sutil al abrir la invitación */
+  .fade-in{
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp .9s ease forwards;
+  }
+  @keyframes fadeUp{ to{ opacity:1; transform: translateY(0);} }
+
+  /* ✅ Dress code aparece suave un poquito después */
+  .dresscode{
+    margin: 10px auto 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a4a4a;
+
+    padding: 6px 12px;
+    border-radius: 999px;
+
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 8px 18px rgba(0,0,0,.06);
+
+    letter-spacing: .2px;
+    white-space: nowrap;
+
+    opacity: 0;
+    transform: translateY(6px);
+    animation: dressIn .9s ease forwards;
+    animation-delay: .35s;
+  }
+  @keyframes dressIn{ to{ opacity:1; transform: translateY(0);} }
+
+  /* ✅ Brillito súper sutil (solo una vez) */
+  .sparkle{
+    z-index: 2;
+    position:absolute;
+    inset:-70%;
+    pointer-events:none;
+    background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.28), transparent 62%);
+    opacity: 0;
+    animation: sparkle 1.2s ease forwards;
+  }
+  @keyframes sparkle{
+    0%{ opacity:0 }
+    25%{ opacity:.22 }
+    100%{ opacity:0 }
+  }
+
+
+  .names{
+    font-family:'Great Vibes', cursive;
+    font-size: 44px;
+    line-height: 1.05;
+    margin: 6px 0 4px;
+    color:#ff4fa1;
+    text-align:center;
+    text-shadow: 0 2px 0 rgba(255,255,255,.8), 0 14px 28px rgba(0,0,0,.10);
+  }
+  @media (max-width:360px){
+    .names{ font-size: 40px; }
+  }
+
+
+  .dressNoteStart{
+    width: min(360px, 100%);
+    margin: 8px 0 12px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    color:#3a3a3a;
+    font-size: 13.5px;
+    line-height: 1.25;
+  }
+  .dressNoteStart b{ font-weight: 800; }
+
+
+  .giftModal{
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 14px;
+    background: rgba(0,0,0,.35);
+    backdrop-filter: blur(6px);
+    z-index: 1001;
+  }
+  .giftModal.open{ display:flex; }
+  .giftSheet{
+    width: min(420px, 100%);
+    background: rgba(255,255,255,.94);
+    border-radius: 22px;
+    padding: 14px 14px 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    color:#2b2b2b;
+    border: 1px solid rgba(255,255,255,.8);
+  }
+  .giftHeader{
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: .2px;
+    margin: 0 0 4px;
+  }
+  .giftSub{
+    font-size: 13.5px;
+    color:#4b4b4b;
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+  .giftList{
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    color:#333;
+  }
+  .giftList li{ margin: 6px 0; }
+  .giftClose{
+    margin-top: 12px;
+    width:100%;
+    border:0;
+    border-radius: 16px;
+    padding: 12px 12px;
+    font-weight: 900;
+    cursor:pointer;
+    background: linear-gradient(180deg, #ffd3e8, #ffe9f4);
+  }
+
+
+  /* ✅ Colores por nombre (misma fuente que el título) */
+  .names .name{ font-family:'Great Vibes', cursive; }
+  .names .maria{ color:#ff4fa1; }
+  .names .wilder{ color:#4aa3ff; }
+  .names .amp{
+    font-family:'Great Vibes', cursive;
+    color:#ff6fae;
+    margin: 0 6px;
+  }
+
+  /* ✅ Asegurar misma fuente para título y nombres */
+  h1{ font-family:'Great Vibes', cursive; }
+
+
+  .liveBadge{
+    font-weight: 800;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.70);
+    border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    color:#2f3a4a;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="rainLayer" id="rainLayer"></div>
+
+<div class="start" id="startScreen">
+  <h2>🎵 Toca para abrir tu invitación 🎵</h2>
+  
+  <div class="dressNoteStart" id="dressNoteStart">
+    🤍 <b>Dress code:</b> ven con una <b>prenda blanca</b> como parte de la temática
+  </div>
+<button id="btnOpen">Abrir invitación</button>
+  <p style="max-width:360px; margin-top:10px; color:#555; font-size:13px;">
+    Nota: en iPhone/Safari el audio solo puede sonar después de un toque (por eso está esta pantalla).
+  </p>
+</div>
+
+<div class="container" id="inviteCard">
+  <span class="sparkle" id="sparkle"></span>
+<h1>Revelación de Sexo</h1>
+
+  <p>✨ Con mucha ilusión y amor en nuestros corazones queremos invitarte a compartir uno de los momentos más especiales de nuestra vida.</p>
+
+  <div class="names" id="names"><span class="name maria">María</span> <span class="amp">&amp;</span> <span class="name wilder">Wilder</span></div>
+  <p>esperan con emoción revelar si nuestro milagro será 💙 niño o 💖 niña.</p>
+
+  <p>🎈 Acompáñanos a descubrir este hermoso secreto 🎈</p>
+
+  <p class="date">📅 Sábado 7 de marzo<br>⏰ 3:00 PM</p>
+<!-- ✅ Contador real -->
+  <div class="counter" id="countdown">⏳ Cargando contador...</div>
+
+  <!-- ✅ Contador de votos -->
+  <div class="votes" aria-hidden="true"><span class="liveBadge" id="liveBadge" style="display:none">🟢 En vivo</span>
+    <span style="display:none" id="liveBadge">🟢 En vivo</span>
+<span>💙 Team Boy: <b id="boyCount">0</b></span>
+    <span>💗 Team Girl: <b id="girlCount">0</b></span>
+  </div>
+
+  <button class="boy" id="btnBoy">💙 Team Boy</button>
+  <button class="girl" id="btnGirl">💖 Team Girl</button>
+  <button class="map" id="btnMap">📍 Cómo llegar</button>
+  <button class="rsvp" id="btnRsvp">📲 Confirmar asistencia</button>
+
+  <p style="margin-top:10px;">
+    ✨ Te esperamos con mucho amor ✨
+  </p>
+
+  <!-- ✅ Mensaje de bloqueo -->
+  <div class="lockMsg" id="lockMsg">✅ Voto registrado. Ya no puedes cambiar de team.</div>
+
+  <!-- ✅ Regalos (nuevo texto como pediste) -->
+</div>
+
+<script>
+  /**********************
+   * CONFIG
+   **********************/
+  const EVENT_DATE = new Date("March 7, 2026 15:00:00").getTime();
+  const MAP_URL = "https://www.google.com/maps/search/?api=1&query=1412+Chariot+Dr+Murfreesboro+TN+37130";
+  const RSVP_PHONE = "16294628232";
+  const RSVP_TEXT = "Hola María y Wilder 💕 Confirmo mi asistencia a la revelación de sexo 🎉👶";
+
+  /**********************
+   * ✅ Audio compatible iPhone/Android
+   * (sin depender de mp3 externo, y sin fallar por autoplay)
+   **********************/
+  let audioUnlocked = false;
+  let audioCtx = null;
+
+  function unlockAudio(){
+    if(audioUnlocked) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // warm-up
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.01);
+    audioUnlocked = true;
+  }
+
+  function clickSound(){
+    if(!audioUnlocked || !audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(880, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.13);
+  }
+
+  /**********************
+   * ✅ Animación de click
+   **********************/
+  function pulseBtn(btn, ev){
+    const r = btn.getBoundingClientRect();
+    const x = ((ev?.clientX ?? (r.left + r.width/2)) - r.left)/r.width * 100;
+    const y = ((ev?.clientY ?? (r.top + r.height/2)) - r.top)/r.height * 100;
+    btn.style.setProperty("--x", x + "%");
+    btn.style.setProperty("--y", y + "%");
+    btn.classList.add("pulse");
+    setTimeout(()=>btn.classList.remove("pulse"), 220);
+  }
+
+  /**********************
+   * ✅ Lluvia (no una sola línea)
+   **********************/
+  const rainLayer = document.getElementById("rainLayer");
+  function spawnRain(type){
+    const count = 48; // lluvia abundante
+    for(let i=0;i<count;i++){
+      const d = document.createElement("div");
+      d.className = "drop";
+      const left = Math.random()*100;
+      const dur  = 2.2 + Math.random()*1.9;
+      const delay= Math.random()*0.25;
+      const sc   = 0.75 + Math.random()*1.25;
+      const rot  = (Math.random()*160 - 80).toFixed(1) + "deg";
+
+      d.style.left = left + "vw";
+      d.style.animationDuration = dur + "s";
+      d.style.animationDelay = delay + "s";
+      d.style.setProperty("--rot", rot);
+      d.style.setProperty("--sc", sc);
+      d.style.fontSize = (18 + Math.random()*18).toFixed(0) + "px";
+
+      if(type === "boy"){
+        d.textContent = (Math.random() > 0.25) ? "🎈" : "💙";
+      }else{
+        d.textContent = (Math.random() > 0.25) ? "💖" : "💗";
+      }
+
+      rainLayer.appendChild(d);
+      setTimeout(()=>d.remove(), (dur+delay+0.6)*1000);
+    }
+  }
+
+  /**********************
+   * ✅ Contador regresivo real
+   **********************/
+  function updateCountdown(){
+    const now = Date.now();
+    let distance = Math.max(0, EVENT_DATE - now);
+
+    const days = Math.floor(distance / (1000*60*60*24)); distance -= days*(1000*60*60*24);
+    const hours = Math.floor(distance / (1000*60*60));    distance -= hours*(1000*60*60);
+    const minutes = Math.floor(distance / (1000*60));     distance -= minutes*(1000*60);
+    const seconds = Math.floor(distance / 1000);
+
+    document.getElementById("countdown").innerHTML =
+      "⏳ Faltan " + days + " días " + hours + "h " + minutes + "m " + seconds + "s";
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  /**********************
+   * ✅ VOTOS + BLOQUEO (por dispositivo)
+   * Nota: para conteo GLOBAL real de todos, hay que usar Firebase/Supabase.
+   **********************/
+  const KEY_COUNTS = "inv_votes_counts_v1";
+  const KEY_CHOICE = "inv_votes_choice_v1";
+
+  function loadCounts(){
+    try{
+      const raw = localStorage.getItem(KEY_COUNTS);
+      if(!raw) return {boy:0, girl:0};
+      const o = JSON.parse(raw);
+      return { boy: Number(o.boy||0), girl: Number(o.girl||0) };
+    }catch(e){ return {boy:0, girl:0}; }
+  }
+  function saveCounts(c){ localStorage.setItem(KEY_COUNTS, JSON.stringify(c)); }
+  function getChoice(){ return localStorage.getItem(KEY_CHOICE); }
+  function setChoice(v){ localStorage.setItem(KEY_CHOICE, v); }
+
+  function refreshVotesUI(){
+    const c = loadCounts();
+    document.getElementById("boyCount").textContent = c.boy;
+    document.getElementById("girlCount").textContent = c.girl;
+  }
+
+  function lockTeamsUI(){
+    document.getElementById("btnBoy").disabled = true;
+    document.getElementById("btnGirl").disabled = true;
+    document.getElementById("lockMsg").classList.add("show");
+  }
+
+  function openGiftModal(team){
+    const modal = document.getElementById("giftModal");
+    const header = document.getElementById("giftHeader");
+    const sub = document.getElementById("giftSub");
+    const ul = document.getElementById("giftListTeam");
+
+    const teamName = (team === "boy") ? "💙 Team Boy" : "💗 Team Girl";
+    header.textContent = `🎁 ${teamName} — 5 ideas`;
+    sub.textContent = "Regalos útiles y necesarios (unisex) para el bebé";
+
+    ul.innerHTML = "";
+    (TEAM_GIFTS[team] || []).slice(0,5).forEach(item=>{
+      const li = document.createElement("li");
+      li.textContent = item;
+      ul.appendChild(li);
+    });
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  }
+
+  function closeGiftModal(){
+    const modal = document.getElementById("giftModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  }
+
+  function vote(team){
+    // Si ya votó (bloqueo en el dispositivo)
+    if(getChoice()) return;
+
+    // ✅ Si Firebase está configurado, vota GLOBAL (en vivo para todos)
+    if(window.FIREBASE_CONFIG && typeof window.__voteGlobal === "function"){
+      // Deshabilitar botones mientras envía
+      document.getElementById("btnBoy").disabled = true;
+      document.getElementById("btnGirl").disabled = true;
+
+      window.__voteGlobal(team).then((res)=>{
+        if(res && res.reason === "already_voted"){
+          // Si ya votó en Firebase, bloquear igual
+          setChoice(res.team);
+          lockTeamsUI();
+          openGiftModal(res.team);
+          return;
+        }
+        // Guardar en local para no permitir cambiar
+        setChoice(team);
+        lockTeamsUI();
+        spawnRain(team);
+        openGiftModal(team);
+      }).catch(()=>{
+        // Si falla, vuelve a habilitar (para intentar)
+        document.getElementById("btnBoy").disabled = false;
+        document.getElementById("btnGirl").disabled = false;
+      });
+
+      return;
+    }
+
+    // ✅ Modo local (solo en este dispositivo)
+    const c = loadCounts();
+    if(team === "boy") c.boy++;
+    if(team === "girl") c.girl++;
+    saveCounts(c);
+    setChoice(team);
+    refreshVotesUI();
+    lockTeamsUI();
+    spawnRain(team);
+    openGiftModal(team);
+  }
+
+  /**********************
+   * ✅ Botones funcionales (mapa + whatsapp)
+   **********************/
+  function openMap(){
+    window.open(MAP_URL, "_blank");
+  }
+  function rsvp(){
+    const msg = encodeURIComponent(RSVP_TEXT);
+    window.open("https://wa.me/" + RSVP_PHONE + "?text=" + msg, "_blank");
+  }
+
+  /**********************
+   * ✅ Inicio / “Abrir invitación”
+   * - No queda fijo
+   * - Desbloquea audio en iPhone/Safari
+   **********************/
+  document.getElementById("btnOpen").addEventListener("click", (ev)=>{
+    unlockAudio();
+    clickSound();
+    pulseBtn(ev.currentTarget, ev);
+
+    // ✅ Ocultar pantalla inicial con fade (suave)
+    const start = document.getElementById("startScreen");
+    start.style.transition = "opacity .38s ease";
+    start.style.opacity = "0";
+    setTimeout(()=> start.style.display = "none", 400);
+
+    // ✅ Animar tarjeta principal (fade + subida suave)
+    const card = document.getElementById("inviteCard");
+    card.classList.remove("fade-in");
+    void card.offsetWidth; // reflow para reiniciar animación
+    card.classList.add("fade-in");
+
+    // ✅ Brillo sutil (reinicia)
+    const sp = document.getElementById("sparkle");
+    if(sp){
+      sp.style.animation = "none";
+      void sp.offsetWidth;
+      sp.style.animation = "";
+    }
+
+    // mini efecto bonito al abrir
+    spawnRain("girl");
+    setTimeout(()=>spawnRain("boy"), 250);
+  }, {passive:true});
+
+  function bindButton(id, handler){
+    const b = document.getElementById(id);
+    b.addEventListener("click", (ev)=>{
+      unlockAudio();
+      clickSound();
+      pulseBtn(b, ev);
+      handler(ev);
+    }, {passive:true});
+  }
+
+  bindButton("btnBoy",  ()=> vote("boy"));
+  bindButton("btnGirl", ()=> vote("girl"));
+  bindButton("btnMap",  openMap);
+  bindButton("btnRsvp", rsvp);
+
+  // init UI
+  refreshVotesUI();
+  if(getChoice()) lockTeamsUI();
+</script>
+
+
+<!-- ✅ Modal de regalos por team (aparece al seleccionar) -->
+<div class="giftModal" id="giftModal" aria-hidden="true">
+  <div class="giftSheet" role="dialog" aria-modal="true" aria-label="Regalos sugeridos">
+    <div class="giftHeader" id="giftHeader">🎁 Sugerencias</div>
+    <div class="giftSub" id="giftSub">Ideas útiles para el bebé (unisex)</div>
+    <ul class="giftList" id="giftListTeam"></ul>
+    <button class="giftClose" id="giftClose">Cerrar ✨</button>
+  </div>
+</div>
+
+
+<!-- ✅ VOTOS EN VIVO (GLOBAL) — Configura Firebase para que todos vean el contador en tiempo real -->
+<script>
+  /* 1) Crea un proyecto en Firebase -> Realtime Database
+     2) Copia aquí tu config:
+        const FIREBASE_CONFIG = { apiKey:"...", authDomain:"...", databaseURL:"...", projectId:"...", appId:"..." };
+     3) Si NO configuras esto, el contador seguirá funcionando solo localmente (por dispositivo).
+  */
+  const FIREBASE_CONFIG = null; // 👈 pega tu config y cambia a objeto
+</script>
+
+<script type="module">
+  // Si no hay config, no hacemos nada (modo local)
+  if(!window.FIREBASE_CONFIG) {
+    // modo local: sin cambios
+  } else {
+    // Firebase modular SDK (CDN)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getDatabase, ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    const db = getDatabase(app);
+
+    // ID único por dispositivo (para bloquear 1 voto por persona)
+    const DID_KEY = "inv_device_id_v1";
+    let deviceId = localStorage.getItem(DID_KEY);
+    if(!deviceId){
+      deviceId = (crypto?.randomUUID ? crypto.randomUUID() : ("d"+Math.random().toString(16).slice(2)+Date.now()));
+      localStorage.setItem(DID_KEY, deviceId);
+    }
+
+    // refs
+    const countsRef = ref(db, "genderReveal/counts");
+    const voteRef   = ref(db, `genderReveal/votes/${deviceId}`);
+
+    // UI: activar badge en vivo
+    const badge = document.getElementById("liveBadge");
+    if(badge) badge.style.display = "inline-flex";
+
+    // Suscribirse a contador en vivo
+    onValue(countsRef, (snap)=>{
+      const v = snap.val() || {boy:0, girl:0};
+      document.getElementById("boyCount").textContent = Number(v.boy||0);
+      document.getElementById("girlCount").textContent = Number(v.girl||0);
+    });
+
+    // Leer voto del dispositivo (si ya votó)
+    async function readMyVote(){
+      try{
+        const s = await get(voteRef);
+        return s.exists() ? s.val() : null;
+      }catch(e){ return null; }
+    }
+
+    // Exponer función global para votar en vivo (la usa vote())
+    window.__voteGlobal = async function(team){
+      // Evitar doble voto: si ya votó en Firebase, no dejar
+      const existing = await readMyVote();
+      if(existing) return {ok:false, reason:"already_voted", team: existing};
+
+      // Guardar voto por dispositivo
+      await set(voteRef, team);
+
+      // Incrementar contador con transacción
+      await runTransaction(countsRef, (cur)=>{
+        const c = cur || {boy:0, girl:0};
+        c.boy = Number(c.boy||0);
+        c.girl = Number(c.girl||0);
+        if(team === "boy") c.boy += 1;
+        if(team === "girl") c.girl += 1;
+        return c;
+      });
+
+      return {ok:true};
+    };
+  }
+</script>
+
+</body>
+</html>
